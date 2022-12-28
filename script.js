@@ -1,67 +1,155 @@
-// Init
+// Инициализация
 const canvas = document.getElementById('canvas')
 const ctx = canvas.getContext('2d');
+
+const body = document.getElementsByTagName('body')[0];
+const bgColorForm = document.getElementById('bg-color-form');
+const formFileInput = document.getElementById('formFile');
+
+bgColorForm.addEventListener('change', (e) => {
+    changeBrushColor(e.target.value)
+})
+
+formFileInput.addEventListener('change', (e) => {
+    changeBackgroundImage(e.target.files[0])
+})
+
+const saveButton = document.getElementById('saveButton')
+const replayButton = document.getElementById('replayButton')
+const deleteButton = document.getElementById('deleteButton')
+
+const dropdownThickness4 = document.getElementById('thickness4')
+const dropdownThickness8 = document.getElementById('thickness8')
+const dropdownThickness16 = document.getElementById('thickness16')
+const dropdownThickness24 = document.getElementById('thickness24')
+const dropdownThickness32 = document.getElementById('thickness32')
+
+dropdownThickness4.addEventListener('click', () => changeThickness(2))
+dropdownThickness8.addEventListener('click', () => changeThickness(4))
+dropdownThickness16.addEventListener('click', () => changeThickness(8))
+dropdownThickness24.addEventListener('click', () => changeThickness(12))
+dropdownThickness32.addEventListener('click', () => changeThickness(16))
 
 canvas.width = window.innerWidth
 canvas.height = window.innerHeight
 
-const viewCenterX = canvas.width / 2
-const viewCenterY = canvas.height / 2
+const WIDTH = canvas.width
+const HEIGHT = canvas.height
 
-// Квадрат
+// Переменные, которые можно менять с фронта
+let DEFAULT_BACKGROUND_COLOR = '#FFFFFF'
+let DEFAULT_STROKE_COLOR = '#000000'
+let CIRCLE_RADIUS = 5
+let coordinates = []
+let isMousedown = false;
 
-// Заливка
-ctx.fillStyle = '#FFFFFF'
+// Функция изменения толщины кисти
+function changeThickness(thickness) {
+    CIRCLE_RADIUS = thickness
+}
 
-// Линия
-ctx.strokeStyle = '#FFFFFF'
-ctx.lineWidth = 5
+// Функция изменения цвета кисти
+function changeBrushColor(color) {
+    DEFAULT_STROKE_COLOR = color
+}
 
-//
-// ctx.strokeRect(50, 50, 400, 400)
+// Функция изменения изображения фоа
+function changeBackgroundImage(file) {
+    const reader = new FileReader();
+    reader.onloadend = function(){
+        body.style.backgroundImage = "url(" + reader.result + ")";
+    }
+    if (file){
+        reader.readAsDataURL(file);
+    }
+}
 
-// Круг
+// Скорость воспроизведения по координатам, мс
+let replaySpeed = 30
 
-// ctx.arc(canvas.width / 2, canvas.height / 2, 100, 0, Math.PI * 2, false)
-// ctx.fill()
+// Хак для непрерывного рисования линия
+canvas.addEventListener('mousedown', () => {
+    isMousedown = true
+})
 
-// Простая анимация
-// setInterval(() => {
-//     ctx.fillStyle = '#000000'
-//     ctx.fillRect(0, 0, canvas.width, canvas.height)
-//
-//     ctx.fillStyle = '#FFFFFF'
-//     ctx.fillRect(positionX++, 50, 400, 400)
-// },100)
+// Хак для непрерывного рисования линия
+canvas.addEventListener('mouseup', () => {
+    isMousedown = false
 
-// увеличивает размер отрисовки
-// ctx.scale(5, 5)
+    // Сбрасываем путь, для корректного воспроизведения
+    ctx.beginPath();
+    coordinates.push('mouseup')
+})
 
-// Поворот на 10 градусов (принимает радианы)
-// ctx.rotate(3 * Math.PI / 180)
+// Основная функция рисования, принимает event
+const draw = (e) => {
+    ctx.lineWidth = CIRCLE_RADIUS * 2
+    ctx.fillStyle = DEFAULT_STROKE_COLOR
+    ctx.strokeStyle = DEFAULT_STROKE_COLOR
 
-// Треугольник
-// ctx.beginPath()
-// ctx.moveTo(50, 50)
-// ctx.lineTo(25, 100)
-// ctx.lineTo(75, 100)
-// ctx.closePath() // аналог ctx.lineTo(50, 50)
+    ctx.lineTo(e.clientX, e.clientY)
+    ctx.stroke()
 
-// отрисовка треугольника
-// ctx.stroke()
+    ctx.beginPath();
+    ctx.arc(e.clientX, e.clientY, CIRCLE_RADIUS, 0, Math.PI * 2)
+    ctx.fill()
 
-// Вывод текста
-// ctx.fillStyle = '#FFFFFF'
-// ctx.textAlign = 'center'
+    ctx.beginPath()
+    ctx.moveTo(e.clientX, e.clientY)
+}
 
-// Cоздание градиента
-let gradient = ctx.createLinearGradient(0, 0, 500, 0)
-gradient.addColorStop('0', 'magenta')
-gradient.addColorStop('.50', 'blue')
-gradient.addColorStop('.100', 'red')
+// Слушатель для рисования
+canvas.addEventListener('mousemove', (e) => {
+    if (isMousedown) {
+        coordinates.push([e.clientX, e.clientY])
+        draw(e)
+    }
+})
 
-ctx.fillStyle = gradient
+// Очистка рисунка
+function clear() {
+    ctx.fillStyle = DEFAULT_BACKGROUND_COLOR
+    ctx.fillRect(0, 0, WIDTH, HEIGHT)
 
-ctx.font = '48px Georgia'
-ctx.fillText("Hello world!", 50, 100)
+    ctx.beginPath();
+    ctx.fillStyle = DEFAULT_STROKE_COLOR
+}
 
+// Сохранение рисунка
+function save() {
+    localStorage.setItem('coordinates', JSON.stringify(coordinates))
+    localStorage.setItem('thickness', JSON.stringify(CIRCLE_RADIUS))
+    alert('Рисунок сохранен')
+}
+
+// Воспроизведение рисунка
+function replay() {
+    let timer = setInterval(async () => {
+        if (!coordinates.length) {
+            clearInterval(timer)
+            ctx.beginPath()
+            return;
+        }
+        let firstPoint = coordinates.shift()
+        let e = {
+            clientX: firstPoint[0],
+            clientY: firstPoint[1]
+        }
+        draw(e)
+    }, replaySpeed)
+}
+
+saveButton.addEventListener('click', () => {
+    save()
+})
+
+replayButton.addEventListener('click', () => {
+    coordinates = JSON.parse(localStorage.getItem('coordinates'))
+    CIRCLE_RADIUS = JSON.parse(localStorage.getItem('thickness'))
+    clear()
+    replay()
+})
+
+deleteButton.addEventListener('click', () => {
+    clear()
+})

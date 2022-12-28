@@ -1,8 +1,9 @@
 body {
     margin: 0;
+    background-repeat: no-repeat;
+    background-position: right 3rem;
+    background-size: cover;
 }
 .block {
     display: block;
-    background-color: #000000;
-    color: #FFFFFF;
 }

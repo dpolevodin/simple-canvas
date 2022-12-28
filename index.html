@@ -4,10 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simple Canvas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
+    <script src="https://kit.fontawesome.com/bef89077f9.js" crossorigin="anonymous"></script>
 </head>
 <body>
+    <div class="d-flex  justify-content-between bg-body-tertiary shadow position-absolute w-100" onerror="alert('an error occurred')">
+        <div class="d-flex p-3 gap-4">
+            <button type="button" class="btn btn-primary" id="saveButton"><i class="fa-solid fa-floppy-disk me-2"></i>Сохранить рисунок</button>
+            <button type="button" class="btn btn-success" id="replayButton"><i class="fa-solid fa-play me-2"></i>Воспроизвести</button>
+            <button type="button" class="btn btn-danger" id="deleteButton"><i class="fa-solid fa-trash me-2"></i>Очистить</button>
+            <div class="d-flex px-5 justify-content-center align-items-center">
+                <div class="dropdown me-5">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Толщина кисти
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item d-flex p-2 gap-2 align-items-center" id="thickness4"><i class="fa-solid fa-circle fa-2xs"></i><div>4px</div></li>
+                        <li class="dropdown-item d-flex p-2 gap-2 align-items-center" id="thickness8" ><i class="fa-solid fa-circle fa-xs"></i><div>8px</div></li>
+                        <li class="dropdown-item d-flex p-2 gap-2 align-items-center" id="thickness16" ><i class="fa-solid fa-circle fa-sm"></i><div>16px</div></li>
+                        <li class="dropdown-item d-flex p-2 gap-2 align-items-center" id="thickness24" ><i class="fa-solid fa-circle fa-lg"></i><div>24px</div></li>
+                        <li class="dropdown-item d-flex p-2 gap-2 align-items-center" id="thickness32" ><i class="fa-solid fa-circle fa-xl"></i><div>32px</div></li>
+                    </ul>
+                </div>
+                    <div class="form d-flex align-items-center gap-2" id="bg-color-form">
+                        <label for="exampleColorInput" class="form-label h5 m-0">Цвет кисти: </label>
+                        <input type="color" class="form-control form-control-color" id="exampleColorInput" value="#000000" title="Choose your color">
+                    </div>
+            </div>
+            <div class="d-flex justify-content-center align-items-center">
+                <input class="form-control" type="file" id="formFile">
+            </div>
+        </div>
+        <div class="d-flex p-3"><i class="fa-solid fa-brush p-3 fa-2xl"></i></div>
+    </div>
     <canvas id="canvas" class="block">Ваш браузер не поддерживает canvas</canvas>
-    <script src="./script.js" />
+    <script src="./script.js" ></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/bef89077f9.js" crossorigin="anonymous"></script>
 </body>
 </html>
+
+
+
